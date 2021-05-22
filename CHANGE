@@ -1,0 +1,17 @@
+cw_reactor CHANGES
+
+solved problem
+	1、wrk的Requests/sec是0
+	   http的回复数据不对
+	2、wrk的Latency MAX是秒级，大概2秒左右
+	   通过修改SYN队列和ACCEPT队列解决
+	3、服务端存在大量的TIME_WAIT
+	   服务端不主动close，等待客户端close
+	4、之前的流程是专门有个accept线程，accept之后把fd放到其他的fd线程
+	   修改为每个线程都有accept，accept之后把fd放到自己的线程
+	   修改完之后Requests/sec提高了一倍，可能的原因：accept多了，放到了自己的线程，避免了切换。
+	   
+unresolved problem
+	1、线程绑定到每个cpu失败
+	2、sched_yield
+	
